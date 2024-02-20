@@ -1,0 +1,6 @@
+services:
+  pd-refresher:
+    build: .
+    restart: always
+    environment:
+      - API_KEY=${API_KEY}
