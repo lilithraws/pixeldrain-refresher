@@ -64,7 +64,11 @@ async def refresh(refreshing_queue, refreshing_executor):
         refreshing_queue.task_done()
 
 def files_need_refresh_filter(obj):
-    last_view = datetime.strptime(obj['date_last_view'], "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=timezone.utc)
+    last_view = datetime.now(timezone.utc)
+    try:
+        last_view = datetime.strptime(obj['date_last_view'], "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=timezone.utc)
+    except ValueError:
+        last_view = datetime.strptime(obj['date_last_view'], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
     now = datetime.now(timezone.utc)
     return (now - last_view).days > 30
 
