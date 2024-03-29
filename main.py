@@ -46,11 +46,11 @@ def refresher(id):
                         except (json.decoder.JSONDecodeError, TypeError):
                             refreshing_logger.info(f'{id} View failed.')
                     else:
-                        raise httpx.HTTPStatusError
+                        raise httpx.HTTPStatusError('')
             except IndexError:
                 refreshing_logger.warning(id + 'Cannot find view token.')
         else:
-            raise httpx.HTTPStatusError
+            raise httpx.HTTPStatusError('')
     except (httpx.HTTPError, httpx.HTTPStatusError):
         refreshing_logger.error('Pixeldrain is unavailable or blocking us.')
 
