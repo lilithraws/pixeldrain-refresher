@@ -26,31 +26,17 @@ finding_scheduler = AsyncIOScheduler()
 def refresher(id):
     refreshing_logger.debug(f'File ID : {id}')
     try:
-        file_viewer_response = httpx.get(f'https://pixeldrain.com/u/{id}')
-        if file_viewer_response.status_code == 200:
-            try:
-                view_token = re.findall(r'"view_token":"(.+)",', file_viewer_response.content.decode())[0]
-                refreshing_logger.debug(f'View Token : {view_token}')
-                if not "".__eq__(view_token):
-                    payload = {
-                        'token': view_token,
-                    }
-                    view_response = httpx.post(f'https://pixeldrain.com/api/file/{id}/view', data=payload)
-                    if view_response.status_code == 200:
-                        try:
-                            view_result = json.loads(view_response.content)
-                            if view_result['success'].__eq__(True):
-                                refreshing_logger.info(f'{id} View succeed.')
-                            else:
-                                raise TypeError
-                        except (json.decoder.JSONDecodeError, TypeError):
-                            refreshing_logger.info(f'{id} View failed.')
-                    else:
-                        raise httpx.HTTPStatusError('')
-            except IndexError:
-                refreshing_logger.warning(id + 'Cannot find view token.')
+        payload = {
+            'd': 'pixeldrain.com',
+            'n': 'pageview',
+            'r': None,
+            'u': f'https://pixeldrain.com/u/{id}',
+        }
+        view_response = httpx.post('https://stats.pixeldrain.com/api/event', data=payload)
+        if (view_response.status_code == 202 or view_response.status_code == 200):
+            refreshing_logger.info(f'{id} View succeed.')
         else:
-            raise httpx.HTTPStatusError('')
+            refreshing_logger.info(f'{id} View failed.')
     except (httpx.HTTPError, httpx.HTTPStatusError):
         refreshing_logger.error('Pixeldrain is unavailable or blocking us.')
 
